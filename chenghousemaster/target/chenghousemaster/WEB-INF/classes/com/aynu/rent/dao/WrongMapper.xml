@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aynu.rent.dao.WrongMapper" >
+<resultMap id="BaseResultMap" type="Wrong" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="house_id" property="house_id" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+   
+    <result column="date" property="date" jdbcType="DATE" />
+    <result column="detail" property="detail" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="userlist_id" property="userlist_id" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+  </resultMap>
+	<select id="selectNotSolveAllCounts" resultType="int">
+		select count(*) from wrong
+	</select>
+  <select id="findwrong" resultMap="BaseResultMap">
+		select * from wrong 
+		  <where>
+			<if test="vo.userlist_id!=null and vo.userlist_id!=''">
+				and userlist_id=#{vo.userlist_id}
+			</if>
+		</where>
+	  limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+	</select>
+	<!--查询未处理的障碍数据条数-->
+	<select id="selectNotSolveWrongCounts" resultType="int">
+		select count(*) from wrong where userlist_id = #{id}
+	</select>
+	<select id="findbyid" parameterType="Integer" resultType="Wrong">
+		select * from wrong 
+		  where id=#{id}
+	</select>
+	<insert id="insertwrong" parameterType="Wrong" >
+		 insert into wrong(house_id,address,date,detail,status,name,userlist_id) 
+	  values(#{house_id},#{address},#{date},#{detail},#{status},#{name},#{userlist_id})
+	</insert>
+	<delete id="deletewrong" parameterType="Integer" >
+		delete from wrong  where id=#{id}
+	</delete>
+</mapper>

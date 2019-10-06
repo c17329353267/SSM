@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aynu.rent.dao.PaidMapper" >
+	<select id="selectUserHasPaidCounts" resultType="int">
+		select count(*) from paid
+		<where>
+			<if test="vo.fromdate!=null and vo.fromdate!=''">
+				date &gt;= #{vo.fromdate}
+			</if>
+			<if test="vo.todate!=null and vo.todate!=''">
+				and date  &lt;= #{vo.todate}
+			</if>
+			<if test="vo.userlist_id!=null and vo.userlist_id!=''">
+				and userlist_id=#{vo.userlist_id}
+			</if>
+		</where>
+	</select>
+	<!--查询所有已经缴纳的租金-->
+	<select id="adminSelectAllUserHasPaidCounts" resultType="int">
+		select count(*) from paid
+		<where>
+			<if test="fromdate!=null and fromdate!=''">
+				date &gt;= #{fromdate}
+			</if>
+			<if test="todate!=null and todate!=''">
+				and date  &lt;= #{todate}
+			</if>
+			<if test="zuname != null and zuname !=''">
+				and name like '%' #{zuname} '%'
+			</if>
+		</where>
+	</select>
+	<select id="selectall" resultMap="BaseResultMap">
+		select * from paid
+		<where>
+			<if test="vo.zuname!=null and vo.zuname!=''">
+			    name like '%' #{vo.zuname} '%'
+			</if>
+			<if test="vo.fromdate!=null and vo.fromdate!=''">
+				and date &gt;= #{vo.fromdate}
+			</if>
+			<if test="vo.todate!=null and vo.todate!=''">
+				and date  &lt;= #{vo.todate}
+			</if>
+			<if test="vo.userlist_id!=null and vo.userlist_id!=''">
+				and userlist_id=#{vo.userlist_id}
+			</if>
+		</where>
+		limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+	</select>
+<resultMap id="BaseResultMap" type="Paid" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="house_id" property="house_id" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DOUBLE" />
+    <result column="date" property="date" jdbcType="DATE" />
+    <result column="paydate" property="paydate" jdbcType="DATE" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="userlist_id" property="userlist_id" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+  </resultMap>
+  <select id="selectsum" resultType="Double">
+    select SUM(price) from paid
+    <where>
+		<if test="zuname!=null and zuname!=''">
+		 name like '%${zuname}%'
+		</if>
+		<if test="fromdate!=null and fromdate!=''">
+		and date &gt;= #{fromdate}
+		</if>
+		<if test="todate!=null and todate!=''">
+		and date  &lt;= #{todate}
+		</if>
+		<if test="userlist_id!=null and userlist_id!=''">
+		and userlist_id=#{userlist_id}
+		</if>
+		</where>
+
+  </select>
+  <delete id="deletepaid" parameterType="Integer" >
+		delete from paid  where id=#{id}
+	</delete>
+	<insert id="insertpaid" parameterType="Paid" >
+		 insert into paid(house_id,address,price,date,paydate,status,name,userlist_id) 
+	  values(#{house_id},#{address},#{price},#{date},#{paydate},#{status},#{name},#{userlist_id})
+	</insert>
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aynu.usermanage.dao.UserManageDao">
+    <select id="selectUser" resultType="User">
+        select * from user_inf
+        <where>
+            <if test="username != null">
+                username like "%"#{username}"%"
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        limit #{start},#{pageSize}
+    </select>
+    <select id="selectUserCount" resultType="int">
+        select count(*) from user_inf
+        <where>
+            <if test="username != null">
+                username like "%"#{username}"%"
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+    <insert id="insertUser">
+        insert into user_inf(loginname, PASSWORD, STATUS, createdate, username)
+        values (#{loginname},#{password},#{status},#{createdate},#{username})
+    </insert>
+    <select id="selectUserById" resultType="User">
+        select * from user_inf where id = #{id}
+    </select>
+    <update id="updateUser">
+        update user_inf set loginname=#{loginname},status=#{status},PASSWORD=#{password},username=#{username} where id = #{id}
+    </update>
+    <delete id="deleteUserById">
+        delete from user_inf where id in
+        <foreach collection="IDS" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

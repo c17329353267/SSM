@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aynu.rent.dao.ZulistMapper" >
+	<select id="adminSelectAllZulistCounts" resultType="int">
+		select count(*) from zulist
+	</select>
+	<select id="findzukezulist" resultMap="userlistzuResultMap">
+		SELECT	z.*,u.*	FROM zulist z
+		left JOIN userlist u ON u.id = z.userlist_id
+		where z.zid=#{id}
+	</select>
+	<select id="findzulistbyuid" resultMap="userlistzuResultMap">
+		SELECT z.*,	u.* FROM zulist z
+		left JOIN userlist u ON u.id = z.userlist_id and u.id=#{userlist_id}
+		limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+	</select>
+	<select id="selectZulistCounts" resultType="int">
+		select count(*) from zulist where userlist_id = #{id}
+	</select>
+  <resultMap id="userlistzuResultMap" type="Zulist" >
+    <id column="zid" property="zid" jdbcType="INTEGER" />
+    <result column="house_id" property="house_id" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+     
+     <result column="contract_id" property="contract_id" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="DOUBLE" />
+      <result column="userlist_id" property="userlist_id" jdbcType="INTEGER" />
+    <association property="userlist" javaType="Userlist">
+			<!-- column:userlist表的主键对应的列  property：userlist对象中id属性-->
+	<id column="id" property="id"/>		
+	<result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="idcard" property="idcard" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+     <result column="user_id" property="user_id" jdbcType="INTEGER" />
+		</association>    
+  </resultMap>
+  
+	<insert id="insertzulist">
+	  insert into zulist(house_id,price,address,userlist_id,contract_id) 
+	  values(#{house_id},#{price},#{address},#{userlist_id},#{contract_id})
+	</insert>
+	<select id="findzuuserlist" resultMap="userlistzuResultMap">
+		SELECT 	z.*,u.* FROM zulist z
+		left JOIN userlist u ON u.id = z.userlist_id
+		limit #{firstLimitParam},#{pageSize}
+	</select>
+	<select id="findzulist" resultType="Zulist">
+		SELECT * FROM zulist
+		WHERE house_id =#{house_id}
+	</select>
+	<delete id="deletezulist">
+		delete from zulist where house_id=#{house_id}
+	</delete>
+</mapper>

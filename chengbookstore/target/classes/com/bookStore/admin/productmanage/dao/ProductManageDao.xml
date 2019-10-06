@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bookStore.admin.productmanage.dao.ProductManageDao">
+    <select id="selectAllProducts" resultType="Product">
+        select * from products
+        <where>
+            <if test="product.id != null and product.id !=''">
+                id = #{product.id}
+            </if>
+            <if test="product.name != null and product.name !=''">
+                and name like '%' #{product.name} '%'
+            </if>
+            <if test="product.category !=null and product.category !=''">
+              and category = #{product.category}
+            </if>
+            <if test="minprice > 0">
+              and price &gt;= #{minprice}
+            </if>
+            <if test="maxprice >0">
+              and price &lt;= #{maxprice}
+            </if>
+        </where>
+         limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+    </select>
+    <select id="selectAllCounts" resultType="int">
+        select count(*) from products
+        <where>
+            <if test="id != null and id !=''">
+                id = #{id}
+            </if>
+            <if test="name != null and name !=''">
+                and name like '%' #{name} '%'
+            </if>
+            <if test="category != null and category !=''">
+                and category = #{category}
+            </if>
+        </where>
+    </select>
+    <!--<select id="selectProductCateGory" resultType="Product">
+        select * from products;
+    </select>-->
+    <!--添加操作-->
+    <insert id="insertProducts">
+        insert into products(id,name,price,category,imgurl,description,pnum)
+        values (#{id},#{name},#{price},#{category},#{imgurl},#{description},#{pnum})
+    </insert>
+    <!--根据id进行查找-->
+    <select id="selectProductById" resultType="Product">
+        select * from products where id = #{id}
+    </select>
+    <!--修改-->
+    <update id="updateProductById">
+        update products
+        <set>
+            <if test="id != null and id !=''">
+                id = #{id},
+            </if>
+            <if test="name != null and name !=''">
+                name = #{name},
+            </if>
+            <if test="category != null and category !=''">
+                category = #{category},
+            </if>
+            <if test="price > 0">
+                price = #{price},
+            </if>
+            <if test="imgurl != null and imgurl !=''">
+                imgurl = #{imgurl},
+            </if>
+            <if test="description != null and description!=''">
+                description = #{description}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <!--删除-->
+    <delete id="deleteProductById">
+        delete from products where id = #{id}
+    </delete>
+    <!--查看销售榜单-->
+    <select id="selectAllProductList" resultType="ProductList">
+        select products.name productName,SUM(orderitem.buynum) salnum
+        from orderitem,orders,products
+        where orderitem.order_id = orders.id
+        and orderitem.product_id = products.id
+        and orders.paystate=1
+        and YEAR(ordertime) = #{year}
+        and MONTH(ordertime) = #{month}
+        group by products.id
+        order by salnum DESC
+    </select>
+
+
+</mapper>

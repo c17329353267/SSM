@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aynu.rent.dao.UserlistMapper" >
+	<!--当前登陆用户修改自己的密码-->
+	<update id="updateUserPassword">
+		update user set password=#{password} where id=#{id}
+	</update>
+	<!--添加新用户信息-->
+	<insert id="insertNewUser">
+		insert into user(username,password,type) values(#{username},#{password},#{type})
+	</insert>
+	<!--查看我的在租用户信息列表-->
+	<select id="selectHasUserListCounnts" resultType="int">
+		select count(*) from userlist where user_id=#{user_id}
+	</select>
+	<select id="findhasuserlist" resultMap="zuResultMap">
+		select * from userlist where user_id=#{user_id}
+	</select>
+	<!--用户租赁信息-->
+	<select id="getUserzuList" resultMap="zuResultMap">
+		SELECT	u.*, z.* FROM userlist u,zulist z
+		where u.id = z.userlist_id
+		and u.id=#{id}
+		limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+	</select>
+	<!--用户租退人信息-->
+	<select id="getmycheckout" resultMap="checkoutResultMap">
+		SELECT	u.*, c.* FROM  userlist u,checkout c
+		where u.id = c.userlist_id
+		and u.id=#{id}
+		limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+	</select>
+	<select id="selectCheckOutCounts" resultType="int">
+		select count(*) from checkout
+		where userlist_id = #{id}
+	</select>
+	<select id="getmyapply" resultMap="applyResultMap">
+		SELECT 	u.*, a.* FROM userlist u,apply a
+		where u.id = a.userlist_id
+		and u.id=#{id}
+		limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+	</select>
+	<select id="selectUserApplyCounts" resultType="int">
+		select count(*) from apply
+		where userlist_id = #{id}
+	</select>
+	<!--查看用户申请退租列表信息-->
+	<select id="getmyapplyout" resultMap="applyoutResultMap">
+		SELECT 	u.*, a.* FROM userlist u,applyout a
+		where u.id = a.userlist_id
+		and u.id=#{id}
+		limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+	</select>
+	<select id="selectUserselfApplyOutCounts" resultType="int">
+		select count(*) from applyout where userlist_id = #{id}
+	</select>
+	<resultMap id="zuResultMap" type="Userlist" >
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="idcard" property="idcard" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="user_id" property="user_id" jdbcType="INTEGER" />
+		<collection property="zulist" ofType="Zulist">
+			<id property="zid" column="zid"/>
+			<!--用户id已经在user对象中存在，此处可以不设置-->
+			<!-- <result property="userId" column="id"/> -->
+			<result property="house_id" column="house_id"/>
+			<result property="address" column="address"/>
+			<result property="contract_id" column="contract_id"/>
+			<result property="price" column="price"/>
+			<result property="status" column="status"/>
+		</collection>
+
+	</resultMap>
+
+  <resultMap id="applyResultMap" type="Userlist" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="idcard" property="idcard" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+     <result column="user_id" property="user_id" jdbcType="INTEGER" />
+     <collection property="apply" ofType="Apply">
+			<id property="id" column="apply_id"/>	
+		<!--用户id已经在user对象中存在，此处可以不设置-->
+			<!-- <result property="userId" column="id"/> -->
+			<result property="house_id" column="house_id"/>
+			<result property="address" column="address"/>
+			<result property="area" column="area"/>
+			<result property="price" column="price"/>
+			<result property="status" column="status"/>
+		</collection>
+     
+  </resultMap>
+   <resultMap id="checkoutResultMap" type="Userlist" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="idcard" property="idcard" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+     <result column="user_id" property="user_id" jdbcType="INTEGER" />
+     <collection property="checkout" ofType="Checkout">
+			<id property="id" column="cid"/>	
+		<!--用户id已经在user对象中存在，此处可以不设置-->
+			<!-- <result property="userId" column="id"/> -->
+			<result property="house_id" column="house_id"/>
+			<result property="address" column="address"/>
+			<result property="userlist_id" column="userlist_id"/>
+			
+			<result property="status" column="status"/>
+		</collection>
+     
+  </resultMap>
+     <resultMap id="applyoutResultMap" type="Userlist" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="idcard" property="idcard" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+     <result column="user_id" property="user_id" jdbcType="INTEGER" />
+     <collection property="applyout" ofType="Applyout">
+			<id property="id" column="aoid"/>	
+		<!--用户id已经在user对象中存在，此处可以不设置-->
+			<!-- <result property="userId" column="id"/> -->
+			<result property="house_id" column="house_id"/>
+			<result property="address" column="address"/>
+			<result property="userlist_id" column="userlist_id"/>
+			
+			<result property="status" column="status"/>
+		</collection>
+     
+  </resultMap>
+      <resultMap id="userMap" type="Userlist" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="idcard" property="idcard" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+     <result column="user_id" property="user_id" jdbcType="INTEGER" />
+     <association property="user" javaType="User">
+			<!-- column:user表的主键对应的列  property：user对象中id属性-->
+			<id column="id" property="id"/>
+			<result column="username" property="username"/>
+			<result column="password" property="password"/>
+		</association>
+
+     
+  </resultMap>
+  <delete id="deleteuser" parameterType="Integer">
+  delete from user where id=#{id}
+  </delete>
+  <delete id="deleteuserlist" parameterType="Integer">
+  delete from userlist where user_id=#{id}
+  </delete>
+	<select id="selectAllZuKeListCounts" resultType="int">
+		select count(*) from userlist
+	</select>
+  <select id="findalluserlist" resultMap="userMap">
+		SELECT 	u.*, ul.* FROM user u,userlist ul
+		where u.id = ul.user_id and u.type='zuke'
+		   limit #{firstLimitParam},#{pageSize}
+	</select>
+ 	
+ 	<select id="checkuserlist" parameterType="String" resultType="Userlist">
+		select * from userlist where idcard=#{idcard}
+	</select>
+	<insert id="insertuserlist" parameterType="Userlist">
+	  insert into userlist(name,idcard,phone,user_id) 
+	  values(#{name},#{idcard},#{phone},#{user_id})
+	</insert>
+	<select id="finduserlistupdate" parameterType="Userlist" resultType="Userlist">
+		select * from userlist where idcard=#{idcard} and id!=#{id}
+	</select>
+	<update id="updateuserlist" parameterType="Userlist">
+		update userlist set name=#{name},idcard=#{idcard},phone=#{phone}
+		where id=#{id}
+</update>
+</mapper>

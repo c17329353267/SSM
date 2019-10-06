@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aynu.documentmanage.dao.DocumentDao">
+    <select id="selectDocumentCounts" resultType="int">
+        select count(*) from document_inf
+        <where>
+            <if test="title != null">
+                title like '%' #{title} '%'
+            </if>
+        </where>
+    </select>
+
+    <select id="selectUserById" resultType="User">
+        select * from user_inf where id = #{id}
+    </select>
+    <resultMap id="DocumentMap" type="Document">
+        <id column="id" property="id"></id>
+        <association property="user" javaType="User"
+                     select="selectUserById"
+                     column="user_id"></association>
+    </resultMap>
+    <select id="selectAllDocuments" resultMap="DocumentMap">
+        select * from document_inf
+        <where>
+            <if test="document.title != null">
+                title like '%' #{document.title} '%'
+            </if>
+        </where>
+        limit  #{pageModel.firstLimitParam},#{pageModel.pageSize}
+    </select>
+    <insert id="uploadDocument">
+        insert into document_inf (filename,title,remark,user_id)
+        values (#{filename},#{title},#{remark},#{user.id})
+    </insert>
+    <select id="selectDocumentsByIds" resultType="String">
+        select filename from document_inf where id in
+        <foreach collection="listIds" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+    <delete id="deleteDocumentsByIds">
+        delete from document_inf where id in
+        <foreach collection="IDS" open="(" separator=","  close=")" item="id">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="selectDocumentsById" resultType="Document">
+        select * from document_inf where id = #{id}
+    </select>
+    <update id="updateDocument">
+        update document_inf
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="filename != null">
+                filename = #{filename},
+            </if>
+            <if test="user != null">
+                user_id = #{user.id}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
